@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Stream Player - Google SSAI</title>
+    <title>Cricket Live Stream Player</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -15,7 +14,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a237e, #311b92, #4a148c);
+            background: linear-gradient(135deg, #0c2461, #1e3799, #4a69bd);
             color: white;
             min-height: 100vh;
             display: flex;
@@ -27,52 +26,38 @@
         .container {
             width: 100%;
             max-width: 1200px;
-            background: rgba(0, 0, 0, 0.9);
-            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             margin-top: 20px;
-            border: 2px solid rgba(255, 193, 7, 0.3);
         }
         
         .header {
-            background: linear-gradient(to right, #0d47a1, #1565c0);
-            padding: 20px;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 3px solid #ffc107;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(to right, #ffc107, #ffeb3b, #ffc107);
-            animation: headerGlow 3s infinite;
+            border-bottom: 3px solid #ff5722;
         }
         
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
         
         .logo {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(45deg, #ffc107, #ffeb3b);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: rotate 10s linear infinite;
-            box-shadow: 0 0 25px rgba(255, 193, 7, 0.8);
+            animation: rotate 8s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.7);
             position: relative;
             overflow: hidden;
         }
@@ -87,7 +72,7 @@
         }
         
         .logo::after {
-            content: "▶️";
+            content: "🏏";
             font-size: 28px;
             filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
         }
@@ -98,79 +83,47 @@
         }
         
         .main-title {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
-            background: linear-gradient(to right, #ffc107, #ffeb3b);
+            background: linear-gradient(to right, #ff5722, #ff9800);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            letter-spacing: 1px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         
         .sub-title {
-            font-size: 16px;
-            color: #ffecb3;
-            margin-top: 5px;
-            font-weight: 500;
+            font-size: 14px;
+            color: #ffcc80;
+            margin-top: 2px;
         }
         
         .live-indicator {
-            background: #f44336;
+            background: #e53935;
             color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
+            padding: 5px 15px;
+            border-radius: 20px;
             font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             animation: pulse 2s infinite;
-            box-shadow: 0 0 15px rgba(244, 67, 54, 0.8);
-            font-size: 18px;
+            box-shadow: 0 0 10px rgba(229, 57, 53, 0.7);
         }
         
         .live-indicator::before {
             content: "";
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background: white;
             border-radius: 50%;
-            animation: blink 1.5s infinite;
-        }
-        
-        .stream-info {
-            padding: 15px 20px;
-            background: rgba(21, 101, 192, 0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .stream-source {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .source-logo {
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(45deg, #4285f4, #34a853, #fbbc05, #ea4335);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            font-size: 14px;
         }
         
         .player-container {
             position: relative;
             width: 100%;
-            background: #000;
-            min-height: 500px;
+            background: black;
+            min-height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -179,15 +132,14 @@
         #video {
             width: 100%;
             height: auto;
-            max-height: 75vh;
+            max-height: 70vh;
             display: block;
-            transition: all 0.3s ease;
+            transition: filter 0.3s ease;
         }
         
         .portrait-mode #video {
-            width: 60%;
+            width: 50%;
             margin: 0 auto;
-            max-height: 85vh;
         }
         
         .loading {
@@ -197,58 +149,52 @@
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #ffc107;
         }
         
         .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(255, 193, 7, 0.3);
-            border-top: 5px solid #ffc107;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 87, 34, 0.3);
+            border-top: 5px solid #ff5722;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
         
         .controls {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.9);
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
             justify-content: space-between;
-            border-top: 2px solid rgba(255, 193, 7, 0.3);
         }
         
         .control-group {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             align-items: center;
         }
         
         .btn {
-            background: linear-gradient(to bottom, #ffc107, #ff8f00);
-            color: #333;
+            background: linear-gradient(to bottom, #ff5722, #e64a19);
+            color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
+            padding: 8px 15px;
+            border-radius: 5px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             transition: all 0.3s ease;
             font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
         .btn:hover {
-            background: linear-gradient(to bottom, #ffca28, #ffc107);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(255, 193, 7, 0.5);
+            background: linear-gradient(to bottom, #ff7043, #ff5722);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(255, 87, 34, 0.4);
         }
         
         .btn:active {
@@ -257,17 +203,13 @@
         
         .btn.active {
             background: linear-gradient(to bottom, #4caf50, #388e3c);
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
-            color: white;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
         }
         
         .slider-container {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: rgba(255,255,255,0.1);
-            padding: 10px 15px;
-            border-radius: 10px;
+            gap: 10px;
         }
         
         .slider-container label {
@@ -276,7 +218,7 @@
         }
         
         .slider {
-            width: 160px;
+            width: 150px;
             height: 8px;
             -webkit-appearance: none;
             background: #333;
@@ -286,147 +228,76 @@
         
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            background: #ffc107;
+            background: #ff5722;
             cursor: pointer;
-            box-shadow: 0 0 8px rgba(255, 193, 7, 0.8);
-            transition: all 0.2s;
-        }
-        
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
         
         .quality-selector {
             display: flex;
-            gap: 8px;
-            background: rgba(255,255,255,0.1);
-            padding: 8px;
-            border-radius: 10px;
+            gap: 5px;
         }
         
         .quality-btn {
-            padding: 8px 15px;
+            padding: 5px 10px;
             background: #333;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 3px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: bold;
         }
         
         .quality-btn:hover {
             background: #555;
-            transform: translateY(-2px);
         }
         
         .quality-btn.active {
-            background: #ffc107;
-            color: #333;
-            box-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
+            background: #ff5722;
+            font-weight: bold;
         }
         
         .footer {
             text-align: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.95);
-            border-top: 2px solid #ffc107;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 2px solid #ff5722;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 18px;
             position: relative;
             overflow: hidden;
         }
         
         .footer-text {
-            background: linear-gradient(to right, #ffc107, #ffeb3b, #ffc107);
+            background: linear-gradient(to right, #ff5722, #ff9800, #ff5722);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             animation: shimmer 3s infinite;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            letter-spacing: 1px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         
-        .media-icon {
+        .cricket-ball {
             position: absolute;
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(45deg, #ffc107, #ffeb3b);
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
             border-radius: 50%;
             top: 50%;
             transform: translateY(-50%);
             animation: bounce 5s infinite alternate;
-            box-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
         }
         
-        .left-icon {
-            left: 25px;
+        .left-ball {
+            left: 20px;
         }
         
-        .right-icon {
-            right: 25px;
-        }
-        
-        .status {
-            padding: 12px 20px;
-            background: rgba(0, 0, 0, 0.8);
-            text-align: center;
-            font-style: italic;
-            color: #ffca28;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .error-message {
-            background: #f44336;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            margin: 10px 20px;
-            border-radius: 10px;
-            display: none;
-            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
-        }
-        
-        .stream-options {
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 20px;
-            background: rgba(21, 101, 192, 0.3);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .option {
-            text-align: center;
-            cursor: pointer;
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .option:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .option.active {
-            background: rgba(255, 193, 7, 0.2);
-            border: 1px solid #ffc107;
-        }
-        
-        .option-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffca28;
-        }
-        
-        .option-label {
-            font-size: 12px;
-            color: #aaa;
+        .right-ball {
+            right: 20px;
         }
         
         @keyframes rotate {
@@ -440,14 +311,9 @@
         }
         
         @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
         
         @keyframes shimmer {
@@ -457,12 +323,55 @@
         
         @keyframes bounce {
             0%, 100% { transform: translateY(-50%); }
-            50% { transform: translateY(-80%); }
+            50% { transform: translateY(-70%); }
         }
         
-        @keyframes headerGlow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        .status {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            text-align: center;
+            font-style: italic;
+            color: #ff9800;
+        }
+        
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            margin: 10px 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .match-info {
+            padding: 10px 20px;
+            background: rgba(30, 55, 153, 0.3);
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .team-flag {
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(to right, #006a4e, #f42a41);
+            border-radius: 3px;
+        }
+        
+        .team-flag.india {
+            background: linear-gradient(to right, #ff9933, #ffffff, #138808);
+        }
+        
+        .vs {
+            font-weight: bold;
+            color: #ffcc80;
         }
         
         @media (max-width: 768px) {
@@ -476,24 +385,19 @@
             }
             
             .portrait-mode #video {
-                width: 85%;
+                width: 80%;
             }
             
             .header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
                 text-align: center;
             }
             
-            .stream-info {
+            .match-info {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
                 text-align: center;
-            }
-            
-            .stream-options {
-                flex-wrap: wrap;
-                gap: 15px;
             }
         }
     </style>
@@ -504,42 +408,22 @@
             <div class="logo-container">
                 <div class="logo"></div>
                 <div class="title-container">
-                    <div class="main-title">Google SSAI Live Stream</div>
-                    <div class="sub-title">High Quality Streaming • Ad Supported</div>
+                    <div class="main-title">Cricket Live Stream</div>
+                    <div class="sub-title">Watch Live Cricket Matches</div>
                 </div>
             </div>
             <div class="live-indicator">LIVE</div>
         </div>
         
-        <div class="stream-info">
-            <div class="stream-source">
-                <div class="source-logo">G</div>
-                <div>
-                    <div class="main-title" style="font-size: 20px;">Google SSAI Stream</div>
-                    <div class="sub-title">Server-Side Ad Insertion Technology</div>
-                </div>
+        <div class="match-info">
+            <div class="team">
+                <div class="team-flag india"></div>
+                <span>India</span>
             </div>
-            <div class="stream-stats">
-                <div class="sub-title">HD Ready • Multi-Bitrate • 25 FPS</div>
-            </div>
-        </div>
-        
-        <div class="stream-options">
-            <div class="option active">
-                <div class="option-value">Auto</div>
-                <div class="option-label">Quality</div>
-            </div>
-            <div class="option">
-                <div class="option-value">25 FPS</div>
-                <div class="option-label">Frame Rate</div>
-            </div>
-            <div class="option">
-                <div class="option-value">Stereo</div>
-                <div class="option-label">Audio</div>
-            </div>
-            <div class="option">
-                <div class="option-value">H.264</div>
-                <div class="option-label">Codec</div>
+            <div class="vs">VS</div>
+            <div class="team">
+                <div class="team-flag"></div>
+                <span>Pakistan</span>
             </div>
         </div>
         
@@ -548,27 +432,26 @@
         <div class="player-container" id="playerContainer">
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Initializing Google SSAI Stream...</p>
-                <p class="sub-title" style="margin-top: 10px;">Connecting to secure media server</p>
+                <p>Loading Cricket Live Stream...</p>
             </div>
             <video id="video" controls></video>
         </div>
         
-        <div class="status" id="status">Loading master playlist...</div>
+        <div class="status" id="status">Initializing cricket stream...</div>
         
         <div class="controls">
             <div class="control-group">
                 <button class="btn" id="portraitBtn">
-                    <i class="fas fa-mobile-alt"></i> Portrait Mode
+                    <i>📱</i> Portrait Mode
                 </button>
                 <button class="btn" id="brightnessReset">
-                    <i class="fas fa-sun"></i> Reset Brightness
+                    <i>🔆</i> Reset Brightness
                 </button>
             </div>
             
             <div class="control-group">
                 <div class="slider-container">
-                    <label for="brightness"><i class="fas fa-adjust"></i> Brightness:</label>
+                    <label for="brightness">Brightness:</label>
                     <input type="range" id="brightness" class="slider" min="0" max="200" value="100">
                 </div>
             </div>
@@ -577,21 +460,17 @@
                 <label>Quality:</label>
                 <div class="quality-selector">
                     <button class="quality-btn active" data-quality="auto">Auto</button>
-                    <button class="quality-btn" data-quality="240p">240p</button>
                     <button class="quality-btn" data-quality="480p">480p</button>
                     <button class="quality-btn" data-quality="720p">720p</button>
+                    <button class="quality-btn" data-quality="1080p">1080p</button>
                 </div>
             </div>
         </div>
         
         <div class="footer">
-            <div class="media-icon left-icon">
-                <i class="fas fa-play"></i>
-            </div>
-            <div class="footer-text">GOOGLE SSAI STREAM PLAYER</div>
-            <div class="media-icon right-icon">
-                <i class="fas fa-film"></i>
-            </div>
+            <div class="cricket-ball left-ball"></div>
+            <div class="footer-text">MADE BY SHANKAR</div>
+            <div class="cricket-ball right-ball"></div>
         </div>
     </div>
 
@@ -607,14 +486,13 @@
             const loading = document.getElementById('loading');
             const errorMessage = document.getElementById('errorMessage');
             
-            // Your Google SSAI stream URL
-            const googleStreamUrl = 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/master.m3u8';
+            // Your live stream URL
+            const liveStreamUrl = 'https://cricketstan.github.io/Channel-13';
             
             // Alternative streams in case the main one doesn't work
             const alternativeStreams = [
-                'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/master.m3u8',
+                'https://cricketstan.github.io/Channel-13',
                 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-                'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
                 'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8'
             ];
             
@@ -650,10 +528,10 @@
                 
                 // If no stream URL provided, use the main one
                 if (!streamUrl) {
-                    streamUrl = googleStreamUrl;
+                    streamUrl = liveStreamUrl;
                 }
                 
-                status.textContent = `Connecting to Google SSAI server...`;
+                status.textContent = `Loading cricket live stream...`;
                 
                 if (Hls.isSupported()) {
                     hls = new Hls({
@@ -674,19 +552,13 @@
                     hls.attachMedia(video);
                     
                     hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        status.textContent = `Google SSAI stream ready - Click play to start`;
+                        status.textContent = `Cricket stream ready - Click play to start`;
                         showLoading(false);
-                        updateStreamInfo();
                     });
                     
                     hls.on(Hls.Events.LEVEL_LOADED, function(event, data) {
-                        status.textContent = `Playing Google SSAI stream`;
+                        status.textContent = `Playing cricket live stream`;
                         showLoading(false);
-                        updateStreamInfo();
-                    });
-                    
-                    hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
-                        updateStreamInfo();
                     });
                     
                     hls.on(Hls.Events.ERROR, function(event, data) {
@@ -713,9 +585,8 @@
                     // For Safari which has native HLS support
                     video.src = streamUrl;
                     video.addEventListener('loadedmetadata', function() {
-                        status.textContent = `Google SSAI stream ready - Click play to start`;
+                        status.textContent = `Cricket stream ready - Click play to start`;
                         showLoading(false);
-                        updateStreamInfo();
                     });
                     
                     video.addEventListener('error', function() {
@@ -741,28 +612,15 @@
                 }
             }
             
-            // Update stream information
-            function updateStreamInfo() {
-                if (hls && hls.levels && hls.levels.length > 0) {
-                    const currentLevel = hls.levels[hls.currentLevel];
-                    if (currentLevel) {
-                        const bitrate = Math.round(currentLevel.bitrate / 1000);
-                        const resolution = `${currentLevel.width}x${currentLevel.height}`;
-                        document.querySelector('.stream-stats .sub-title').textContent = 
-                            `${resolution} • ${bitrate} kbps • 25 FPS`;
-                    }
-                }
-            }
-            
             // Start with the main stream
-            initPlayer(googleStreamUrl);
+            initPlayer(liveStreamUrl);
             
             // Portrait mode toggle
             portraitBtn.addEventListener('click', function() {
                 playerContainer.classList.toggle('portrait-mode');
                 portraitBtn.classList.toggle('active');
                 portraitBtn.innerHTML = playerContainer.classList.contains('portrait-mode') ? 
-                    '<i class="fas fa-desktop"></i> Landscape Mode' : '<i class="fas fa-mobile-alt"></i> Portrait Mode';
+                    '<i>📺</i> Landscape Mode' : '<i>📱</i> Portrait Mode';
             });
             
             // Brightness control
@@ -794,7 +652,7 @@
                         // In a real implementation, you would change the stream quality here
                         // For now, we'll just show a message
                         setTimeout(() => {
-                            status.textContent = `Playing Google SSAI stream`;
+                            status.textContent = `Playing cricket live stream`;
                         }, 2000);
                     }
                 });
@@ -802,12 +660,12 @@
             
             // Update status based on video events
             video.addEventListener('waiting', function() {
-                status.textContent = 'Buffering Google SSAI stream...';
+                status.textContent = 'Buffering cricket stream...';
                 showLoading(true);
             });
             
             video.addEventListener('playing', function() {
-                status.textContent = 'Playing Google SSAI stream';
+                status.textContent = 'Playing cricket live stream';
                 showLoading(false);
             });
             
@@ -819,13 +677,12 @@
                 showLoading(false);
             });
             
-            // Add click handlers for stream options
-            document.querySelectorAll('.option').forEach(option => {
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
+            // Simulate live match updates
+            setInterval(() => {
+                const scores = ['IND: 245/3 (38.2)', 'IND: 267/4 (41.5)', 'IND: 289/5 (44.1)'];
+                const randomScore = scores[Math.floor(Math.random() * scores.length)];
+                document.querySelector('.sub-title').textContent = `Live: ${randomScore} | Watch Live Cricket`;
+            }, 10000);
         });
     </script>
 </body>
