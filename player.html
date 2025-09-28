@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHANKAR Video Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #ff5722;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate 8s linear infinite;
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.7);
+        }
+        
+        .logo i {
+            font-size: 24px;
+            color: white;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(to right, #ff5722, #ff9800);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .player-container {
+            position: relative;
+            width: 100%;
+            background: black;
+        }
+        
+        #video {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+        
+        .portrait-mode #video {
+            width: 50%;
+            margin: 0 auto;
+        }
+        
+        .controls {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, #ff5722, #e64a19);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to bottom, #ff7043, #ff5722);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(255, 87, 34, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn.active {
+            background: linear-gradient(to bottom, #4caf50, #388e3c);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .slider-container label {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .slider {
+            width: 150px;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #333;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff5722;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .quality-selector {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .quality-btn {
+            padding: 5px 10px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quality-btn:hover {
+            background: #555;
+        }
+        
+        .quality-btn.active {
+            background: #ff5722;
+            font-weight: bold;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 2px solid #ff5722;
+            font-weight: bold;
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer-text {
+            background: linear-gradient(to right, #ff5722, #ff9800, #ff5722);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shimmer 3s infinite;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cricket-ball {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: bounce 5s infinite alternate;
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
+        }
+        
+        .left-ball {
+            left: 20px;
+        }
+        
+        .right-ball {
+            right: 20px;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-50%); }
+            50% { transform: translateY(-70%); }
+        }
+        
+        .status {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            text-align: center;
+            font-style: italic;
+            color: #ff9800;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                justify-content: center;
+            }
+            
+            .portrait-mode #video {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <i>🏏</i>
+                </div>
+                <div class="title">SHANKAR Video Player</div>
+            </div>
+            <div class="status" id="status">Loading stream...</div>
+        </div>
+        
+        <div class="player-container" id="playerContainer">
+            <video id="video" controls></video>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <button class="btn" id="portraitBtn">
+                    <i>📱</i> Portrait Mode
+                </button>
+                <button class="btn" id="brightnessReset">
+                    <i>🔆</i> Reset Brightness
+                </button>
+            </div>
+            
+            <div class="control-group">
+                <div class="slider-container">
+                    <label for="brightness">Brightness:</label>
+                    <input type="range" id="brightness" class="slider" min="0" max="200" value="100">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label>Quality:</label>
+                <div class="quality-selector">
+                    <button class="quality-btn" data-quality="240p">240p</button>
+                    <button class="quality-btn" data-quality="360p">360p</button>
+                    <button class="quality-btn" data-quality="480p">480p</button>
+                    <button class="quality-btn active" data-quality="720p">720p</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="cricket-ball left-ball"></div>
+            <div class="footer-text">MADE BY SHANKAR</div>
+            <div class="cricket-ball right-ball"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('video');
+            const playerContainer = document.getElementById('playerContainer');
+            const portraitBtn = document.getElementById('portraitBtn');
+            const brightnessSlider = document.getElementById('brightness');
+            const brightnessReset = document.getElementById('brightnessReset');
+            const qualityButtons = document.querySelectorAll('.quality-btn');
+            const status = document.getElementById('status');
+            
+            // Define the stream URLs for different qualities
+            const streamQualities = {
+                '240p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_1.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/afffd913eef1c1cfbf79cbd44881bf6d/bandwidth/328024.m3u8',
+                '360p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_2.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/caebc5bb95cedd3764ba62b048b75ccf/bandwidth/570904.m3u8',
+                '480p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_3.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/5f5e52a629631556553d922f8ee09c2b/bandwidth/813784.m3u8',
+                '720p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_4.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/5f3000588990fd69e822ee104cea52a4/bandwidth/1663838.m3u8'
+            };
+            
+            let hls;
+            let currentQuality = '720p';
+            
+            // Initialize HLS player
+            function initPlayer(quality) {
+                if (hls) {
+                    hls.destroy();
+                }
+                
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        enableWorker: false,
+                        lowLatencyMode: true,
+                        backBufferLength: 90
+                    });
+                    
+                    hls.loadSource(streamQualities[quality]);
+                    hls.attachMedia(video);
+                    
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        status.textContent = `Playing: ${quality} Quality`;
+                        video.play().catch(e => {
+                            status.textContent = "Click play to start video";
+                        });
+                    });
+                    
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        if (data.fatal) {
+                            switch(data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    status.textContent = "Network error. Trying to recover...";
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    status.textContent = "Media error. Trying to recover...";
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    status.textContent = "Fatal error. Cannot recover.";
+                                    hls.destroy();
+                                    break;
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    // For Safari
+                    video.src = streamQualities[quality];
+                    video.addEventListener('loadedmetadata', function() {
+                        status.textContent = `Playing: ${quality} Quality`;
+                        video.play().catch(e => {
+                            status.textContent = "Click play to start video";
+                        });
+                    });
+                }
+            }
+            
+            // Start with 720p quality
+            initPlayer(currentQuality);
+            
+            // Portrait mode toggle
+            portraitBtn.addEventListener('click', function() {
+                playerContainer.classList.toggle('portrait-mode');
+                portraitBtn.classList.toggle('active');
+                portraitBtn.innerHTML = playerContainer.classList.contains('portrait-mode') ? 
+                    '<i>📺</i> Landscape Mode' : '<i>📱</i> Portrait Mode';
+            });
+            
+            // Brightness control
+            brightnessSlider.addEventListener('input', function() {
+                const brightnessValue = this.value / 100;
+                video.style.filter = `brightness(${brightnessValue})`;
+            });
+            
+            // Reset brightness
+            brightnessReset.addEventListener('click', function() {
+                brightnessSlider.value = 100;
+                video.style.filter = 'brightness(1)';
+            });
+            
+            // Quality selection
+            qualityButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const quality = this.getAttribute('data-quality');
+                    
+                    // Update active button
+                    qualityButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Change quality if different from current
+                    if (quality !== currentQuality) {
+                        currentQuality = quality;
+                        status.textContent = `Switching to ${quality}...`;
+                        initPlayer(quality);
+                    }
+                });
+            });
+            
+            // Update status based on video events
+            video.addEventListener('waiting', function() {
+                status.textContent = 'Buffering...';
+            });
+            
+            video.addEventListener('playing', function() {
+                status.textContent = `Playing: ${currentQuality} Quality`;
+            });
+            
+            video.addEventListener('ended', function() {
+                status.textContent = 'Stream ended';
+            });
+        });
+    </script>
+</body>
+</html>
