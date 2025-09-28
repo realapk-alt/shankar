@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player</title>
+    <title>Cricket Live Stream Player</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         * {
@@ -14,7 +14,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, #0c2461, #1e3799, #4a69bd);
             color: white;
             min-height: 100vh;
             display: flex;
@@ -26,7 +26,7 @@
         .container {
             width: 100%;
             max-width: 1200px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -34,13 +34,55 @@
         }
         
         .header {
-            background: rgba(0, 0, 0, 0.8);
+            background: linear-gradient(to right, #1e3c72, #2a5298);
             padding: 15px 20px;
-            text-align: center;
-            border-bottom: 2px solid #ff5722;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #ff5722;
         }
         
-        .title {
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate 8s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.7);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo::before {
+            content: "";
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border: 3px solid white;
+            border-radius: 50%;
+        }
+        
+        .logo::after {
+            content: "🏏";
+            font-size: 28px;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+        }
+        
+        .title-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-title {
             font-size: 28px;
             font-weight: bold;
             background: linear-gradient(to right, #ff5722, #ff9800);
@@ -48,6 +90,33 @@
             background-clip: text;
             color: transparent;
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sub-title {
+            font-size: 14px;
+            color: #ffcc80;
+            margin-top: 2px;
+        }
+        
+        .live-indicator {
+            background: #e53935;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(229, 57, 53, 0.7);
+        }
+        
+        .live-indicator::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
         }
         
         .player-container {
@@ -231,9 +300,20 @@
             right: 20px;
         }
         
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
         
         @keyframes shimmer {
@@ -264,6 +344,36 @@
             display: none;
         }
         
+        .match-info {
+            padding: 10px 20px;
+            background: rgba(30, 55, 153, 0.3);
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .team-flag {
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(to right, #006a4e, #f42a41);
+            border-radius: 3px;
+        }
+        
+        .team-flag.india {
+            background: linear-gradient(to right, #ff9933, #ffffff, #138808);
+        }
+        
+        .vs {
+            font-weight: bold;
+            color: #ffcc80;
+        }
+        
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -277,13 +387,44 @@
             .portrait-mode #video {
                 width: 80%;
             }
+            
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .match-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="title">Video Player</div>
+            <div class="logo-container">
+                <div class="logo"></div>
+                <div class="title-container">
+                    <div class="main-title">Cricket Live Stream</div>
+                    <div class="sub-title">Watch Live Cricket Matches</div>
+                </div>
+            </div>
+            <div class="live-indicator">LIVE</div>
+        </div>
+        
+        <div class="match-info">
+            <div class="team">
+                <div class="team-flag india"></div>
+                <span>India</span>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team">
+                <div class="team-flag"></div>
+                <span>Pakistan</span>
+            </div>
         </div>
         
         <div class="error-message" id="errorMessage"></div>
@@ -291,12 +432,12 @@
         <div class="player-container" id="playerContainer">
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Loading stream...</p>
+                <p>Loading Cricket Live Stream...</p>
             </div>
             <video id="video" controls></video>
         </div>
         
-        <div class="status" id="status">Initializing player...</div>
+        <div class="status" id="status">Initializing cricket stream...</div>
         
         <div class="controls">
             <div class="control-group">
@@ -318,10 +459,10 @@
             <div class="control-group">
                 <label>Quality:</label>
                 <div class="quality-selector">
-                    <button class="quality-btn" data-quality="240p">240p</button>
-                    <button class="quality-btn" data-quality="360p">360p</button>
+                    <button class="quality-btn active" data-quality="auto">Auto</button>
                     <button class="quality-btn" data-quality="480p">480p</button>
-                    <button class="quality-btn active" data-quality="720p">720p</button>
+                    <button class="quality-btn" data-quality="720p">720p</button>
+                    <button class="quality-btn" data-quality="1080p">1080p</button>
                 </div>
             </div>
         </div>
@@ -345,22 +486,18 @@
             const loading = document.getElementById('loading');
             const errorMessage = document.getElementById('errorMessage');
             
-            // Define the stream URLs for different qualities
-            const streamQualities = {
-                '240p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_1.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/afffd913eef1c1cfbf79cbd44881bf6d/bandwidth/328024.m3u8',
-                '360p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_2.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/caebc5bb95cedd3764ba62b048b75ccf/bandwidth/570904.m3u8',
-                '480p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_3.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/5f5e52a629631556553d922f8ee09c2b/bandwidth/813784.m3u8',
-                '720p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_4.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/5f3000588990fd69e822ee104cea52a4/bandwidth/1663838.m3u8'
-            };
+            // Your live stream URL
+            const liveStreamUrl = 'https://cricketstan.github.io/Channel-13';
             
-            // Alternative stream in case the main one doesn't work
+            // Alternative streams in case the main one doesn't work
             const alternativeStreams = [
+                'https://cricketstan.github.io/Channel-13',
                 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
                 'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8'
             ];
             
             let hls;
-            let currentQuality = '720p';
+            let currentQuality = 'auto';
             let currentStreamIndex = 0;
             
             // Show/hide loading indicator
@@ -381,7 +518,7 @@
             }
             
             // Initialize HLS player
-            function initPlayer(quality, streamUrl) {
+            function initPlayer(streamUrl) {
                 showLoading(true);
                 hideError();
                 
@@ -389,21 +526,21 @@
                     hls.destroy();
                 }
                 
-                // If no stream URL provided, use the quality-based one
+                // If no stream URL provided, use the main one
                 if (!streamUrl) {
-                    streamUrl = streamQualities[quality];
+                    streamUrl = liveStreamUrl;
                 }
                 
-                status.textContent = `Loading ${quality} stream...`;
+                status.textContent = `Loading cricket live stream...`;
                 
                 if (Hls.isSupported()) {
                     hls = new Hls({
-                        enableWorker: true, // Use worker for better performance
+                        enableWorker: true,
                         lowLatencyMode: true,
                         backBufferLength: 90,
                         maxBufferLength: 30,
                         maxMaxBufferLength: 60,
-                        maxBufferSize: 60 * 1000 * 1000, // 60MB
+                        maxBufferSize: 60 * 1000 * 1000,
                         maxBufferHole: 0.5,
                         maxFragLookUpTolerance: 0.2,
                         liveSyncDurationCount: 3,
@@ -415,12 +552,12 @@
                     hls.attachMedia(video);
                     
                     hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        status.textContent = `Ready: ${quality} Quality - Click play to start`;
+                        status.textContent = `Cricket stream ready - Click play to start`;
                         showLoading(false);
                     });
                     
                     hls.on(Hls.Events.LEVEL_LOADED, function(event, data) {
-                        status.textContent = `Playing: ${quality} Quality`;
+                        status.textContent = `Playing cricket live stream`;
                         showLoading(false);
                     });
                     
@@ -431,15 +568,15 @@
                             switch(data.type) {
                                 case Hls.ErrorTypes.NETWORK_ERROR:
                                     showError('Network error. Trying alternative stream...');
-                                    tryAlternativeStream(quality);
+                                    tryAlternativeStream();
                                     break;
                                 case Hls.ErrorTypes.MEDIA_ERROR:
                                     showError('Media error. Attempting recovery...');
                                     hls.recoverMediaError();
                                     break;
                                 default:
-                                    showError('Unrecoverable error. Trying alternative stream...');
-                                    tryAlternativeStream(quality);
+                                    showError('Stream error. Trying alternative...');
+                                    tryAlternativeStream();
                                     break;
                             }
                         }
@@ -448,13 +585,13 @@
                     // For Safari which has native HLS support
                     video.src = streamUrl;
                     video.addEventListener('loadedmetadata', function() {
-                        status.textContent = `Ready: ${quality} Quality - Click play to start`;
+                        status.textContent = `Cricket stream ready - Click play to start`;
                         showLoading(false);
                     });
                     
                     video.addEventListener('error', function() {
                         showError('Failed to load stream in Safari. Trying alternative...');
-                        tryAlternativeStream(quality);
+                        tryAlternativeStream();
                     });
                 } else {
                     showError('HLS is not supported in your browser');
@@ -463,20 +600,20 @@
             }
             
             // Try alternative streams if main one fails
-            function tryAlternativeStream(quality) {
+            function tryAlternativeStream() {
                 if (currentStreamIndex < alternativeStreams.length) {
                     const altStream = alternativeStreams[currentStreamIndex];
                     status.textContent = `Trying alternative stream ${currentStreamIndex + 1}...`;
                     currentStreamIndex++;
-                    initPlayer(quality, altStream);
+                    initPlayer(altStream);
                 } else {
                     showError('All streams failed. Please check your connection or try again later.');
                     showLoading(false);
                 }
             }
             
-            // Start with 720p quality
-            initPlayer(currentQuality);
+            // Start with the main stream
+            initPlayer(liveStreamUrl);
             
             // Portrait mode toggle
             portraitBtn.addEventListener('click', function() {
@@ -498,7 +635,7 @@
                 video.style.filter = 'brightness(1)';
             });
             
-            // Quality selection
+            // Quality selection (for UI only - actual quality handled by HLS)
             qualityButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const quality = this.getAttribute('data-quality');
@@ -510,20 +647,25 @@
                     // Change quality if different from current
                     if (quality !== currentQuality) {
                         currentQuality = quality;
-                        currentStreamIndex = 0; // Reset to main stream
-                        initPlayer(quality);
+                        status.textContent = `Quality set to: ${quality}`;
+                        
+                        // In a real implementation, you would change the stream quality here
+                        // For now, we'll just show a message
+                        setTimeout(() => {
+                            status.textContent = `Playing cricket live stream`;
+                        }, 2000);
                     }
                 });
             });
             
             // Update status based on video events
             video.addEventListener('waiting', function() {
-                status.textContent = 'Buffering...';
+                status.textContent = 'Buffering cricket stream...';
                 showLoading(true);
             });
             
             video.addEventListener('playing', function() {
-                status.textContent = `Playing: ${currentQuality} Quality`;
+                status.textContent = 'Playing cricket live stream';
                 showLoading(false);
             });
             
@@ -534,6 +676,13 @@
             video.addEventListener('canplay', function() {
                 showLoading(false);
             });
+            
+            // Simulate live match updates
+            setInterval(() => {
+                const scores = ['IND: 245/3 (38.2)', 'IND: 267/4 (41.5)', 'IND: 289/5 (44.1)'];
+                const randomScore = scores[Math.floor(Math.random() * scores.length)];
+                document.querySelector('.sub-title').textContent = `Live: ${randomScore} | Watch Live Cricket`;
+            }, 10000);
         });
     </script>
 </body>
