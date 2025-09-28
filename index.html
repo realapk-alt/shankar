@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHANKAR Video Player</title>
+    <title>Video Player</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         * {
@@ -36,37 +36,12 @@
         .header {
             background: rgba(0, 0, 0, 0.8);
             padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            text-align: center;
             border-bottom: 2px solid #ff5722;
         }
         
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .logo {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(45deg, #ff5722, #ff9800);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: rotate 8s linear infinite;
-            box-shadow: 0 0 15px rgba(255, 87, 34, 0.7);
-        }
-        
-        .logo i {
-            font-size: 24px;
-            color: white;
-        }
-        
         .title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             background: linear-gradient(to right, #ff5722, #ff9800);
             -webkit-background-clip: text;
@@ -79,11 +54,16 @@
             position: relative;
             width: 100%;
             background: black;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         #video {
             width: 100%;
             height: auto;
+            max-height: 70vh;
             display: block;
             transition: filter 0.3s ease;
         }
@@ -91,6 +71,25 @@
         .portrait-mode #video {
             width: 50%;
             margin: 0 auto;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 87, 34, 0.3);
+            border-top: 5px solid #ff5722;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
         }
         
         .controls {
@@ -232,9 +231,9 @@
             right: 20px;
         }
         
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @keyframes shimmer {
@@ -253,6 +252,16 @@
             text-align: center;
             font-style: italic;
             color: #ff9800;
+        }
+        
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            margin: 10px 20px;
+            border-radius: 5px;
+            display: none;
         }
         
         @media (max-width: 768px) {
@@ -274,18 +283,20 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo-container">
-                <div class="logo">
-                    <i>🏏</i>
-                </div>
-                <div class="title">SHANKAR Video Player</div>
-            </div>
-            <div class="status" id="status">Loading stream...</div>
+            <div class="title">Video Player</div>
         </div>
         
+        <div class="error-message" id="errorMessage"></div>
+        
         <div class="player-container" id="playerContainer">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading stream...</p>
+            </div>
             <video id="video" controls></video>
         </div>
+        
+        <div class="status" id="status">Initializing player...</div>
         
         <div class="controls">
             <div class="control-group">
@@ -331,6 +342,8 @@
             const brightnessReset = document.getElementById('brightnessReset');
             const qualityButtons = document.querySelectorAll('.quality-btn');
             const status = document.getElementById('status');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
             
             // Define the stream URLs for different qualities
             const streamQualities = {
@@ -340,59 +353,125 @@
                 '720p': 'https://dai.google.com/ssai/event/AiCi-L2OSQycd8KtHm0nIA/out/v1/cfed49dc0449444bac761f9dd9155916/std_mdl-700300010_4.m3u8?hdntl=exp=1759112751~acl=*~hmac=83ecba10ee8171650948f5d004eed3396fe74c235011142f23a84af23fc271b7&originpath=/linear/hls/pb/event/AiCi-L2OSQycd8KtHm0nIA/stream/6fa85f01-a141-4b48-872f-27dee9017c87:TPE2/variant/5f3000588990fd69e822ee104cea52a4/bandwidth/1663838.m3u8'
             };
             
+            // Alternative stream in case the main one doesn't work
+            const alternativeStreams = [
+                'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+                'https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8'
+            ];
+            
             let hls;
             let currentQuality = '720p';
+            let currentStreamIndex = 0;
+            
+            // Show/hide loading indicator
+            function showLoading(show) {
+                loading.style.display = show ? 'block' : 'none';
+            }
+            
+            // Show error message
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                status.textContent = 'Error: ' + message;
+            }
+            
+            // Hide error message
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
             
             // Initialize HLS player
-            function initPlayer(quality) {
+            function initPlayer(quality, streamUrl) {
+                showLoading(true);
+                hideError();
+                
                 if (hls) {
                     hls.destroy();
                 }
                 
+                // If no stream URL provided, use the quality-based one
+                if (!streamUrl) {
+                    streamUrl = streamQualities[quality];
+                }
+                
+                status.textContent = `Loading ${quality} stream...`;
+                
                 if (Hls.isSupported()) {
                     hls = new Hls({
-                        enableWorker: false,
+                        enableWorker: true, // Use worker for better performance
                         lowLatencyMode: true,
-                        backBufferLength: 90
+                        backBufferLength: 90,
+                        maxBufferLength: 30,
+                        maxMaxBufferLength: 60,
+                        maxBufferSize: 60 * 1000 * 1000, // 60MB
+                        maxBufferHole: 0.5,
+                        maxFragLookUpTolerance: 0.2,
+                        liveSyncDurationCount: 3,
+                        liveMaxLatencyDurationCount: 10,
+                        debug: false
                     });
                     
-                    hls.loadSource(streamQualities[quality]);
+                    hls.loadSource(streamUrl);
                     hls.attachMedia(video);
                     
                     hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        status.textContent = `Ready: ${quality} Quality - Click play to start`;
+                        showLoading(false);
+                    });
+                    
+                    hls.on(Hls.Events.LEVEL_LOADED, function(event, data) {
                         status.textContent = `Playing: ${quality} Quality`;
-                        video.play().catch(e => {
-                            status.textContent = "Click play to start video";
-                        });
+                        showLoading(false);
                     });
                     
                     hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error('HLS Error:', data);
+                        
                         if (data.fatal) {
                             switch(data.type) {
                                 case Hls.ErrorTypes.NETWORK_ERROR:
-                                    status.textContent = "Network error. Trying to recover...";
-                                    hls.startLoad();
+                                    showError('Network error. Trying alternative stream...');
+                                    tryAlternativeStream(quality);
                                     break;
                                 case Hls.ErrorTypes.MEDIA_ERROR:
-                                    status.textContent = "Media error. Trying to recover...";
+                                    showError('Media error. Attempting recovery...');
                                     hls.recoverMediaError();
                                     break;
                                 default:
-                                    status.textContent = "Fatal error. Cannot recover.";
-                                    hls.destroy();
+                                    showError('Unrecoverable error. Trying alternative stream...');
+                                    tryAlternativeStream(quality);
                                     break;
                             }
                         }
                     });
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    // For Safari
-                    video.src = streamQualities[quality];
+                    // For Safari which has native HLS support
+                    video.src = streamUrl;
                     video.addEventListener('loadedmetadata', function() {
-                        status.textContent = `Playing: ${quality} Quality`;
-                        video.play().catch(e => {
-                            status.textContent = "Click play to start video";
-                        });
+                        status.textContent = `Ready: ${quality} Quality - Click play to start`;
+                        showLoading(false);
                     });
+                    
+                    video.addEventListener('error', function() {
+                        showError('Failed to load stream in Safari. Trying alternative...');
+                        tryAlternativeStream(quality);
+                    });
+                } else {
+                    showError('HLS is not supported in your browser');
+                    showLoading(false);
+                }
+            }
+            
+            // Try alternative streams if main one fails
+            function tryAlternativeStream(quality) {
+                if (currentStreamIndex < alternativeStreams.length) {
+                    const altStream = alternativeStreams[currentStreamIndex];
+                    status.textContent = `Trying alternative stream ${currentStreamIndex + 1}...`;
+                    currentStreamIndex++;
+                    initPlayer(quality, altStream);
+                } else {
+                    showError('All streams failed. Please check your connection or try again later.');
+                    showLoading(false);
                 }
             }
             
@@ -431,7 +510,7 @@
                     // Change quality if different from current
                     if (quality !== currentQuality) {
                         currentQuality = quality;
-                        status.textContent = `Switching to ${quality}...`;
+                        currentStreamIndex = 0; // Reset to main stream
                         initPlayer(quality);
                     }
                 });
@@ -440,14 +519,20 @@
             // Update status based on video events
             video.addEventListener('waiting', function() {
                 status.textContent = 'Buffering...';
+                showLoading(true);
             });
             
             video.addEventListener('playing', function() {
                 status.textContent = `Playing: ${currentQuality} Quality`;
+                showLoading(false);
             });
             
             video.addEventListener('ended', function() {
                 status.textContent = 'Stream ended';
+            });
+            
+            video.addEventListener('canplay', function() {
+                showLoading(false);
             });
         });
     </script>
